@@ -8,7 +8,12 @@ import java.util.Scanner;
  *
  */
 public class POJ_3624 {
-	
+	/**
+	 * 遇到的问题：用二维数组存储物品组合最大价值时，空间复杂度太大了？不符合题目要求
+	 * 解决方法： 用一维数组存储价值（因为第i个物品价值总和只与第i-1个物品时的价值总和有关）
+	 * 			且用“人人为我”递推型动归实现。
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		//input
 		Scanner sc = new Scanner(System.in);
@@ -28,32 +33,33 @@ public class POJ_3624 {
 			
 		}
 		
-		//制表（二维数组）V(i,j)......表示前i个商品中，背包为容量为j时的商品组合的最大价值
-		int [][]v = new int[N+1][M+1];
 		
-		/****递推公式：************
+		int v[] = new int[M+1];//一维数组代替二维
+		
+		/****记忆递推公式：************
 		 * 	1.太大，放不下	Wi > M , v(i,j) = v(i-1,j); 
 		 * 	2.可放，但要看价值      
 		 *    Wi < M , v(i,j) = max(v(i-1,j),v(i-1,j- Wi)+Di )	
 		 *     比较不放第i个时的最值a与放第i个时容量刚好为j时的最值b，取a与b的max
 		 */
 		
-		for(int i = 1; i<=N;i++) {
-			for(int j = 1; j<=M;j++) {
-				//1
-				if(w[i] > j) {
-					v[i][j] = v[i-1][j];
-				}
-				//2
-				else {
-					
-					v[i][j] = v[i-1][j] > (v[i-1][j-w[i]]+d[i])? 
-							v[i-1][j] : (v[i-1][j-w[i]]+d[i]);
-				}
+		for(int i = 0 ;i<=M; i++) {
+			//给一维数组v赋初值
+			if(w[1]<=i) {
+				v[i] = d[1];
+			}else {
+				v[i]=0;
 			}
 		}
 		
-		System.out.println(v[N][M]);//要的最大值存于此
+		//从第二个物品开始，逆序比较
+		for (int i = 2; i <= N; i++) {
+			for (int j = M; j >= w[i]; j--) {
+				v[j]=Math.max(v[j], v[ j-w[i] ] + d[i]);
+			}
+		}
+		
+		System.out.println(v[M]);//要的最大值存于此
 		
 	}
 }
